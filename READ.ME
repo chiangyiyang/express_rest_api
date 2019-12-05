@@ -6,3 +6,5 @@ npm install -g nodemon
 nodemon
 curl http://localhost:3000/items
 curl http://localhost:3000/items/1
+npm install --save body-parser
+curl -X POST -H "Content-Type: application/json" --data '{ "id":"7", "dev":"a03", "timestamp": "1575562562134", "t": "22", "h": "86"}' http://localhost:3000/items
