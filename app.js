@@ -21,10 +21,10 @@ app.route("/items")
         // filter list copy, by excluding item to delete
         const filtered_list = value.filter(item => item.dev == req.query.dev);
 
-        // return updated list
-        res.json(filtered_list);
-      } else
-        res.json(value);
+        value = filtered_list
+      }
+
+      res.json(value);
     });
   })
   .post((req, res) => {
