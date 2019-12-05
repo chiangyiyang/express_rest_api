@@ -12,72 +12,72 @@ app.use(body_parser.json());
 
 app.get('/', (req, res) => res.send('Rest Api with Node and Express!'));
 
-app.get("/items", (req, res) => {
-  db.get('items', function (err, value) {
-    if (err && err.notFound) return res.json({ message: 'No item' });
-    if (err) return console.log('Error!', err);
-    res.json(value);
-  });
-});
+app.route("/items")
+  .get((req, res) => {
+    db.get('items', function (err, value) {
+      if (err && err.notFound) return res.json({ message: 'No item' });
+      if (err) return console.log('Error!', err);
+      res.json(value);
+    });
+  })
+  .post((req, res) => {
+    db.get('items', function (err, value) {
+      if (err && !err.notFound) return console.log('Error!', err);
+      if (err && err.notFound) value = [];
+      const item = req.body;
+      console.log('Adding new item: ', item);
+      console.log(value);
 
-app.get("/items/:id", (req, res) => {
-  db.get('items', function (err, value) {
-    if (err && err.notFound) return res.json({ message: 'No item' });
-    if (err) return console.log('Error!', err);
-    const itemId = req.params.id;
-    const item = value.find(_item => _item.id === itemId);
+      // add new item to array
+      value.push(item)
 
-    if (item) {
-      res.json(item);
-    } else {
-      res.json({ message: `item ${itemId} doesn't exist` })
-    }
-  });
-});
+      // return updated list
+      res.json(value);
 
-app.post("/items", (req, res) => {
-  db.get('items', function (err, value) {
-    if (err && !err.notFound) return console.log('Error!', err);
-    if (err && err.notFound) value = [];
-    const item = req.body;
-    console.log('Adding new item: ', item);
-    console.log(value);
-
-    // add new item to array
-    value.push(item)
-
-    // return updated list
-    res.json(value);
-
-    // save list
-    db.put('items', value, function (err) {
-      if (err) return console.log('Ooops!', err);
+      // save list
+      db.put('items', value, function (err) {
+        if (err) return console.log('Ooops!', err);
+      });
     });
   });
-});
 
-app.delete("/items/:id", (req, res) => {
-  db.get('items', function (err, value) {
-    if (err && err.notFound) return res.json({ message: 'No item' });
-    if (err) return console.log('Error!', err);
-    const itemId = req.params.id;
+app.route("/items/:id")
+  .get((req, res) => {
+    db.get('items', function (err, value) {
+      if (err && err.notFound) return res.json({ message: 'No item' });
+      if (err) return console.log('Error!', err);
+      const itemId = req.params.id;
+      const item = value.find(_item => _item.id === itemId);
 
-    console.log("Delete item with id: ", itemId);
+      if (item) {
+        res.json(item);
+      } else {
+        res.json({ message: `item ${itemId} doesn't exist` })
+      }
+    });
+  })
+  .delete((req, res) => {
+    db.get('items', function (err, value) {
+      if (err && err.notFound) return res.json({ message: 'No item' });
+      if (err) return console.log('Error!', err);
+      const itemId = req.params.id;
 
-    // filter list copy, by excluding item to delete
-    const filtered_list = value.filter(item => item.id !== itemId);
+      console.log("Delete item with id: ", itemId);
 
-    // replace old list with new one
-    value = filtered_list;
+      // filter list copy, by excluding item to delete
+      const filtered_list = value.filter(item => item.id !== itemId);
 
-    // return updated list
-    res.json(value);
+      // replace old list with new one
+      value = filtered_list;
 
-    // save list
-    db.put('items', value, function (err) {
-      if (err) return console.log('Ooops!', err);
+      // return updated list
+      res.json(value);
+
+      // save list
+      db.put('items', value, function (err) {
+        if (err) return console.log('Ooops!', err);
+      });
     });
   });
-});
 
 app.listen(3000, () => console.log('Listen on port 3000'));
