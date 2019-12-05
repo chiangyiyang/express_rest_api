@@ -56,4 +56,28 @@ app.post("/items", (req, res) => {
   });
 });
 
+app.delete("/items/:id", (req, res) => {
+  db.get('items', function (err, value) {
+    if (err && err.notFound) return res.json({ message: 'No item' });
+    if (err) return console.log('Error!', err);
+    const itemId = req.params.id;
+
+    console.log("Delete item with id: ", itemId);
+
+    // filter list copy, by excluding item to delete
+    const filtered_list = value.filter(item => item.id !== itemId);
+
+    // replace old list with new one
+    value = filtered_list;
+
+    // return updated list
+    res.json(value);
+
+    // save list
+    db.put('items', value, function (err) {
+      if (err) return console.log('Ooops!', err);
+    });
+  });
+});
+
 app.listen(3000, () => console.log('Listen on port 3000'));
