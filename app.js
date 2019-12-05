@@ -17,7 +17,14 @@ app.route("/items")
     db.get('items', function (err, value) {
       if (err && err.notFound) return res.json({ message: 'No item' });
       if (err) return console.log('Error!', err);
-      res.json(value);
+      if (req.query.dev) {
+        // filter list copy, by excluding item to delete
+        const filtered_list = value.filter(item => item.dev == req.query.dev);
+
+        // return updated list
+        res.json(filtered_list);
+      } else
+        res.json(value);
     });
   })
   .post((req, res) => {
